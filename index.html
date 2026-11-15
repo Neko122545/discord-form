@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord送信フォーム</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #1a1a1a;
+      padding: 2rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 16px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      background: #5865f2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:active {
+      background: #4752c4;
+    }
+    #status {
+      margin-top: 12px;
+      text-align: center;
+      min-height: 1.2em;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Discordに送信</h1>
+    <textarea id="message" placeholder="ここにメッセージを入力..."></textarea>
+    <button onclick="sendToDiscord()">送信する</button>
+    <div id="status"></div>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1571536451483607170/GvFlIARVI_dKLqVVzX0Fd_mH_tH9kCHdXAuvN3sptUy9FeUDzLpV9z-U_b4qk6gcaklR";
+
+    async function sendToDiscord() {
+      const message = document.getElementById("message").value.trim();
+      const status = document.getElementById("status");
+
+      if (!message) {
+        status.textContent = "メッセージを入力してください";
+        status.style.color = "#ff6b6b";
+        return;
+      }
+
+      status.textContent = "送信中...";
+      status.style.color = "#aaa";
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            content: message,
+            username: "サイトからの送信",
+          }),
+        });
+
+        if (response.ok) {
+          status.textContent = "送信完了！";
+          status.style.color = "#51cf66";
+          document.getElementById("message").value = "";
+        } else {
+          throw new Error("送信失敗");
+        }
+      } catch (err) {
+        status.textContent = "送信に失敗しました";
+        status.style.color = "#ff6b6b";
+        console.error(err);
+      }
+    }
+
+    document.getElementById("message").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendToDiscord();
+      }
+    });
+  </script>
+</body>
+</html>
